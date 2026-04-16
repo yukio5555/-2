@@ -61,11 +61,21 @@ def _eval_node(node: ast.AST) -> float:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="簡単なCLI電卓")
-    parser.add_argument("expression", help="計算式。例: '1 + 2 * (3 - 4)'")
-    args = parser.parse_args()
+    parser.add_argument("expression", nargs="?", help="計算式。例: '1 + 2 * (3 - 4)'")
+    args, unknown = parser.parse_known_args()
+
+    tokens = []
+    if args.expression is not None:
+        tokens.append(args.expression)
+    tokens.extend(unknown)
+
+    if not tokens:
+        parser.error("the following arguments are required: expression")
+
+    expression = " ".join(tokens)
 
     try:
-        result = eval_expr(args.expression)
+        result = eval_expr(expression)
     except CalculatorError as exc:
         print(f"エラー: {exc}")
         return 1
